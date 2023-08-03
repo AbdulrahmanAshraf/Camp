@@ -1,0 +1,134 @@
+﻿@model PlaystationProject.Dtos.Devices.RunDeviceDto
+
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/style-rtl.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
+
+
+<div aria-hidden="true" aria-labelledby="modal-run-device-label" role="dialog" tabindex="-1" id="modal-run-device" class="modal fade"
+     data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="section_title custom_title">تشغيل جهاز</h4>
+                <button type="button" class="close" data-bs-dismiss="modal"><span aria-hidden="true">×</span></button>
+            </div>
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "addForm" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body form-horizontal" dir="rtl">
+                    <div class="form-group row">
+                        <div class="form-group mb-2 text-right">
+                            <label class="form-label"> اسم الجهاز<span class="text-danger">*</span></label>
+                            <select class="form-select form-select-sm form-control-solid" aria-label="Default select example" asp-for="DeviceId">
+                                <option value="" selected>اختر الجهاز</option>
+                                @foreach (var device in ViewData["devices"] as List<PlaystationProject.Dtos.DropDown>)
+                                {
+                                    <option value="@device.Id">@device.Name</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.DeviceId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group text-right">
+                                <input type="radio" value="SINGL" name="PeriodType" /> فردي
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <div class="form-group">
+                                <input type="radio" value="MULTI" name="PeriodType" />  زوجي
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(model => model.PeriodType, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm m-0 login-page-form-loginBtn mt-3" id="btnSubmit">
+                        <i class="fa fa-power-off"></i>  تشغيل
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<script src="~/js/jquery-3.6.0.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="@Url.Content("~/js/jquery.validate.min.js")"></script>
+<script src="@Url.Content("~/js/jquery.validate.unobtrusive.min.js")"></script>
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            type: "Get",
+            url: "/CheckAuthorization/GetCanViewLinks",
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+            success: function (res) {
+                if (res.workingDevices == false) {
+                    $(".workingDevices").hide();
+                }
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+            }
+        });
+    });
+</script>
+<script>
+    $('#btnSubmit').on("click", function () {
+        $.ajax({
+            type: "POST",
+            url: "/WorkingDevices/RunDevice",
+            data: $('#addForm').serialize(),
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+
+            success: function (res) {
+                if (res.success) {
+                    toastr.success('', res.message, toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    setTimeout(function () { location.replace('/'); }, 1000);
+                }
+                else {
+                    toastr.error('', res.message, toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    setTimeout(function () { location.replace('/'); }, 1000);
+                }
+
+            }
+        });
+        return false;
+    });
+</script>
+

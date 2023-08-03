@@ -1,0 +1,257 @@
+﻿@model PlaystationProject.Dtos.Orders.AddEditOrderDto
+
+@{
+    Layout = null;
+}
+
+
+
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/style-rtl.css">
+
+<div aria-hidden="true" aria-labelledby="modal-add-order-label" role="dialog" tabindex="-1" id="modal-add-order" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="section_title custom_title">اضافة طلب </h4>
+                <button type="button" class="close" data-bs-dismiss="modal"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="container" dir="rtl">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-10 m-auto">
+                            <div class="row">
+                                <div class="col-12 mt-5 row" id="div-register">
+                                    <div class="col-12 steps-page-content">
+                                        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "addOrderForm" }))
+                                        {
+                                            @Html.AntiForgeryToken();
+                                            @*<input type="text" id="total" asp-for="TotalCost" hidden />*@
+                                            <div id="register-form-wizard">
+                                                <section data-steps="1">
+                                                    <div class="card-body p-0">
+                                                        <div class="form-group mb-3">
+                                                            <label class="form-label">نوع المنتج<span class="text-danger">*</span></label>
+                                                            <select class="form-select form-select-sm form-control-solid"
+                                                                    aria-label="Default select example" id="categorySelect" onchange="selectCategory()">
+                                                                <option selected value="@null">ادخل نوع المنتج</option>
+                                                                @foreach (var category in ViewData["catagories"] as List<PlaystationProject.Dtos.DropDown>)
+                                                                {
+                                                                    <option value="@category.Code">@category.Name</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group mb-3 row">
+                                                            <div class="col-sm-6">
+                                                                <label class="form-label"> المنتج<span class="text-danger">*</span></label>
+                                                                <select class="form-select form-select-sm form-control-solid"
+                                                                        aria-label="Default select example" id="productSelect" asp-for="SelectedProduct">
+                                                                    <option selected value="@null"> اختر المنتج </option>
+                                                                </select>
+                                                            </div>
+                                                            <!--<div class="col-sm-6">-->
+                                                            @*<label class="form-label"> الكمية<span class="text-danger">*</span></label><br />
+                                                            <input type="number" min="0" id="quantity" value="0" placeholder="ادخل الكمية" />*@
+                                                            <!--<span style="border-radius:1rem; cursor: pointer; border: 1px solid; padding: 3px; color: white; background-color: #158285; " id="addProduct"> <i class="fas fa-plus"></i></span>
+                                                        </div>-->
+                                                            <div class="form-group mb-2 col-sm-6">
+
+                                                                <button class="btn btn-primary text-center remove" style="margin-top:33px" type="button" onclick="addProduct()">
+                                                                    <i class="fas fa-plus"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div id="products" class="mb-3">
+                                                            @foreach (var product in Model.Products)
+                                                            {
+                                                                @Html.Partial("ProductDetail", product)
+                                                            }
+                                                        </div>
+                                                        <div class="form-group mb-3">
+                                                            <label class="form-label"> اختر الجهاز اذا وجد</label>
+                                                            <select class="form-select form-select-sm form-control-solid" asp-for="WorkingDeviceId"
+                                                                    aria-label="Default select example" id="categorySelect" onchange="selectCategory()">
+                                                                <option selected value="@null">الجهاز</option>
+                                                                @foreach (var device in ViewData["orderdevices"] as List<PlaystationProject.Dtos.DropDown>)
+                                                                {
+                                                                    <option value="@device.Id">@device.Name</option>
+                                                                }
+
+                                                            </select>
+                                                        </div>
+                                                        <!--<div class="row mb-3">
+                                                        <div class="form-group col-md-6">
+                                                            <label class="form-label form-label"> التكلفة الاجمالية</label>
+                                                            <input type="text" id="totalcost" disabled asp-for="TotalCost" />
+                                                        </div>-->
+                                                        @*<div class="form-group col-md-6">
+                                                            <label class="form-label form-label"> تم الدفع</label>
+                                                            <input type="checkbox" style="margin: 9px;" asp-for="IsPaid" />
+                                                        </div>*@
+                                                        <!--</div>-->
+                                                        <div class="col-md-12 mx-auto mb-2">
+                                                            <div>
+                                                                <button id="addOrder" class="btn btn-sm m-0 login-page-form-loginBtn mt-3">
+                                                                    <span> اضافة</span>
+                                                                    <i class="fa fa-plus mr-3"></i>
+                                                                </button>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ul id="cost" hidden>
+        </ul>
+        <ul id="selectedProductsIds" hidden>
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            type: "Get",
+            url: "/CheckAuthorization/GetCanViewLinks",
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+            success: function (res) {
+                if (res.showOrders == false) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+                else $(".mySelect").val(document.getElementById('paidOrNot').value).attr('selected', 'selected');
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+            }
+        });
+    });
+</script>
+<script>
+    function selectCategory() {
+        $("#productSelect").empty();
+        document.getElementById('productSelect').add(new Option('اختر المنتج', null))
+        var select = document.getElementById('categorySelect');
+        $.ajax({
+            type: "Get",
+            url: `/Order/GetProductByCategory?category=${select.value}`,
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+
+        }).done(function (res) {
+            var productSelect = document.getElementById('productSelect');
+            var costUl = document.getElementById('cost');
+            res.forEach(d => {
+                productSelect.add(new Option(d.name, d.id))
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(d.id + ',' + d.cost));
+                costUl.appendChild(li);
+            });
+
+        });
+
+    }
+
+        function addProduct() {
+          
+            let productSelect = document.getElementById('productSelect');
+            var products = $('#selectedProductsIds li').map(function () {
+                return $(this).html();
+            }).toArray();
+            if (productSelect.value && products.find(a => a == productSelect.value) == null) {
+                var costs = $('#cost li').map(function () {
+                    return $(this).html();
+                }).toArray();
+                let cost = Number(costs.find(a => a.split(',')[0] == productSelect.value).split(',')[1])
+
+                $.ajax({
+                    type: "Get",
+                    url: `/Order/AddNewProductToOrder?productName=${$('#productSelect :selected').text()}&productId=${productSelect.value}&cost=${cost}`
+
+                }).done(function (partialView) {
+                    $('#products').append(partialView);
+                    var productsUl = document.getElementById('selectedProductsIds');
+                    var li = document.createElement("li");
+                    li.id = productSelect.value;
+                    li.appendChild(document.createTextNode(productSelect.value));
+                    productsUl.appendChild(li);
+                    productSelect.value = null
+                });
+            }
+        }
+        $('#products').on('click', '.remove', (function () {
+
+            var container = $(this).closest('.item');
+            var id = container.toArray()[0].childNodes[3].value
+            container.remove();
+            var elem = document.getElementById(id);
+            elem.parentNode.removeChild(elem);
+        }));
+
+    $('#addOrder').on("click", function () {
+        $.ajax({
+            type: "POST",
+            url: "/Order/CreateEditOrder",
+            data: $('#addOrderForm').serialize(),
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+            success: function (res) {
+                if (res.success) {
+                    toastr.success('', res.message, toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    setTimeout(function () { location.reload(); }, 1000);
+                }
+                else {
+                    toastr.error('', res.message, toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    setTimeout(function () { location.reload(); }, 1000);
+                }
+
+            }
+        });
+        return false;
+    })
+
+</script>
+

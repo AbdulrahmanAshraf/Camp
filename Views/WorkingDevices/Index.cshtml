@@ -1,0 +1,310 @@
+﻿@*@model List<PlaystationProject.Dtos.WorkingDevices.GetAllWorkingDevicesDto>*@
+
+<style>
+    .card {
+        border-radius: 1rem;
+        border: none;
+        -webkit-box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+        position: relative;
+        -webkit-transition: -webkit-transform 0.3s ease;
+        transition: -webkit-transform 0.3s ease;
+        transition: transform 0.3s ease;
+        transition: transform 0.3s ease, -webkit-transform 0.3s ease;
+    }
+
+        .card:hover {
+            -webkit-transform: scale(1.05);
+            transform: scale(1.05);
+        }
+
+        .card .card-body {
+            height: 12rem;
+            overflow-y: auto;
+        }
+
+            .card .card-body span {
+                display: -webkit-box;
+                display: -ms-flexbox;
+                display: flex;
+                -webkit-box-pack: center;
+                -ms-flex-pack: center;
+                justify-content: center;
+            }
+
+                .card .card-body span.friend-name {
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
+                    -webkit-box-pack: center;
+                    -ms-flex-pack: center;
+                    justify-content: center;
+                    margin-top: 0.5rem;
+                    color: #2bb574;
+                    font-weight: bold;
+                    list-style: none;
+                    padding-left: 0;
+                    overflow-y: auto;
+                    height: 4rem;
+                }
+</style>
+
+
+<section class="cat-area img-bg-bg workshop-section workingDevices">
+    <div class="container workshop-section-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="overlay-img">
+                    <div class="section-heading text-center">
+                        <img src="../images/vicon.png" alt="icon section" class="custom-image">
+                        <h4 class="section_title custom_title">الاجهزة</h4>
+                    </div>
+                </div>
+                <div class="overlay-img"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <button id="runDeviceModel" type="button" class="btn btn-sm m-0 login-page-form-loginBtn mb-4" data-bs-toggle="modal" data-bs-target="#modal-run-device">
+                    تشغيل جهاز <i class="fa fa-power-off"></i>
+                </button>
+            </div>
+            <div class="col-md-6">
+                <button id="addOrderModel" class="btn btn-sm m-0 login-page-form-loginBtn mb-4" data-bs-toggle="modal" data-bs-target="#modal-add-order">
+                    اضافة طلب <i class="fa fa-plus mr-3"></i>
+                </button>
+            </div>
+        </div>
+
+        @using (Html.BeginForm("Index", "WorkingDevices", FormMethod.Get))
+        {
+    <div class="row d-flex justify-content-center  workshop-table-container">
+        <div class="col-md-1">
+            <span>حاله الجهاز</span>
+        </div>
+        <div class="col-md-2">
+
+            <select class="form-select form-select-sm mySelect" aria-label="Default select example" name="isOpen" value="@ViewBag.isOpen">
+                <option selected value="@null">الكل</option>
+                <option value="open">مفتوح</option>
+                <option value="closed">مغلق</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <span>بحث :</span>
+            <input type="text" name="search" value="@ViewBag.search" />
+            <input type="text" hidden id="isOpen" value="@ViewBag.isOpen" />
+        </div>
+        <div class="col-md-1">
+            <button id="send-message-btn" class="btn btn-sm m-0 login-page-form-loginBtn" type="submit">بحث</button>
+        </div>
+        @if (ViewBag.search != null)
+        {
+            <div class="col-md-2">
+                <button class="btn btn-sm m-0 login-page-form-loginBtn" style="background-color:red" type="button"
+                        onclick="location.href='@Url.Action("Index", "WorkingDevices")'">
+                    الغاء البحث
+                    <i class="fa fa-times" aria-hidden="true"></i>
+
+                </button>
+            </div>
+        }
+    </div>
+        }
+
+        @if (Model.Count > 0)
+        {
+            <div class="row mt-4">
+                @foreach (var workingDevice in Model)
+                {
+                    <div class="col-lg-6 col-md-3 mb-3">
+                        <div class="card">
+                            @if (workingDevice.IsWorking)
+                            {
+                                <span class="badge badge-success rounded p-1 px-2">مفتوح</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger rounded p-1 px-2">مفلق</span>
+                            }
+                            <div class="card-body">
+                                <span class="friend-name">جهاز: @workingDevice.DeviceName</span>
+                                <div class="row">
+                                        <div class="col-md-3 col-sm-12 p-2">
+                                            @if (workingDevice.IsWorking)
+                                            {
+                                                <button onclick="AddPeriod('@workingDevice.Id')" class="btn btn-sm m-0 mb-2 login-page-form-loginBtn" data-bs-toggle="modal" data-bs-target="#modal-add-period">
+                                                    اضافة فترة <i class="fa fa-plus"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                        <div class="col-md-3 col-sm-12 p-2">
+                                            <button onclick="ViewDetails('@workingDevice.Id')" type="button" class="btn btn-sm m-0 login-page-form-loginBtn mb-4" data-bs-toggle="modal" data-bs-target="#modal-device-details">
+                                                التفاصيل <i class="fa fa-info-circle"></i>
+                                            </button>
+                                        </div>
+                                        <div class="col-md-3 col-sm-12 p-2">
+                                            @if (workingDevice.IsWorking)
+                                            {
+                                                <button onclick="CloseDevice('@workingDevice.Id')" class="btn btn-sm m-0 mb-2 login-page-form-loginBtn" data-bs-toggle="modal" data-bs-target="#modal-close-device">
+                                                    اغلاق <i class="fa fa-power-off"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                        @if (workingDevice.IsWorking && workingDevice.OrderId != null)
+                                        {
+                                            <div class="col-md-3 col-sm-12 p-2">
+
+                                                <button class="btn btn-sm m-0 mb-2 login-page-form-loginBtn" onclick="location.href='@Url.Action("EditOrder", "Order", new { id = workingDevice.OrderId })'">
+                                                    تعديل الطلب <i class="fas fa-edit"></i>
+                                                </button>
+
+                                            </div>
+                                        }
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (ViewBag.length > ViewBag.pagesize)
+            {
+                <button id="send-message-btn" class="btn btn-sm m-0 login-page-form-loginBtn mb-4" onclick="location.href = '/?pagesize=@(ViewBag.pagesize+3)'">
+                    <span> عرض المزيد</span>
+                    <i class="fa fa-eye"></i>
+                </button>
+            }
+        }
+        else
+        {
+            <div class="row d-flex justify-content-center  workshop-table-container">
+                <div class="col-md-9">
+                    <div class="empty-data-block mt-5">
+                        <div>
+                            <img src="./images/noData.svg" alt="No Data Image" />
+                            <p>لا يوجد بيانات</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @await Html.PartialAsync("_RunDevice", new PlaystationProject.Dtos.Devices.RunDeviceDto())
+        @await Html.PartialAsync("_AddPeriod", new PlaystationProject.Dtos.Devices.AddPeriodDto())
+        @await Html.PartialAsync("_CloseDevice", new PlaystationProject.Dtos.WorkingDevices.GetWorkingDeviceDetailsDto())
+        @await Html.PartialAsync("_WorkingDeviceDetails", new PlaystationProject.Dtos.WorkingDevices.GetWorkingDeviceDetailsDto())
+        @await Html.PartialAsync("~/Views/Order/CreateOrder.cshtml", new PlaystationProject.Dtos.Orders.AddEditOrderDto() { Products = new List<PlaystationProject.Dtos.Orders.AddProductToOrderDto>() })
+
+    </div>
+</section>
+
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            type: "Get",
+            url: "/CheckAuthorization/GetCanViewLinks",
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+            success: function (res) {
+                if (res.workingDevices == false) {
+                    $(".workingDevices").hide();
+                }
+                else
+                    $(".mySelect").val(document.getElementById('isOpen').value).attr('selected', 'selected');
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+            }
+        });
+    });
+</script>
+
+@section Scripts{
+    <script>
+
+        function CloseDevice(id) {
+            let url = 'WorkingDevices/GetWorkingDeviceToClose?Id=' + id
+            $.get(url).done(function (data) {
+                $('#modal-close-device').modal('show')
+                $('#deviceId').val(data.id);
+                $('#Name').html(data.name);
+                $('#StartDate').html(data.startDate);
+                $('#EndDate').html(data.endDate);
+                $('#PlayStationTotalCost').html(data.playStationTotalCost);
+                $('#OrderTotalCost').html(data.orderTotalCost);
+                $('#TotalCost').html(data.orderTotalCost + data.playStationTotalCost);
+                
+            })
+        }
+
+        function ViewDetails(id) {
+            let url = 'WorkingDevices/GetWorkingDeviceDetails?Id=' + id
+            $.get(url).done(function (data) {
+                $('#modal-device-details').modal('show')
+                $('#DeviceName').html(data.name);
+                $('#DeviceStartDate').html(data.startDate);
+                $('#DeviceEndDate').html(data.endDate);
+                $('#DevicePlayStationTotalCost').html(data.playStationTotalCost);
+                $('#DevicePeriods').empty()
+                $('#DeviceOrder').empty()
+                //$('#Discount').html(data.discount);
+                $('#DevicePeriods').append($('<tr>')
+                    .append($('<th>').append('النوع'))
+                    .append($('<th>').append('المدة الزمنيه'))
+                    .append($('<th>').append('المبلغ'))
+                )
+                data.periods.forEach(a => {
+                    $('#DevicePeriods').append($('<tr>')
+                        .append($('<td>').append(a.type))
+                        .append($('<td>').append(a.totalHours))
+                        .append($('<td>').append(a.cost))
+                    )
+                })
+                $('#DeviceOrderTotalCost').html(data.orderTotalCost);
+                if (data.orderDetails.length > 0) {
+                    $('#DeviceOrder').append($('<tr>')
+                        .append($('<th>').append('المنتج'))
+                        .append($('<th>').append('الكمية'))
+                        .append($('<th>').append('السعر'))
+                        .append($('<th>').append('الاجمالي'))
+                    )
+                    data.orderDetails.forEach(a => {
+                        $('#DeviceOrder').append($('<tr>')
+                            .append($('<td>').append(a.name))
+                            .append($('<td>').append(a.count))
+                            .append($('<td>').append(a.price))
+                            .append($('<td>').append(a.total))
+                        )
+                    })
+                }
+            })
+
+        }
+
+        function AddPeriod(id) {
+            $('#workingdeviceIdInput').val(id);
+            $('#modal-add-period').modal('show')
+        }
+
+        $('#runDeviceModel').click(function (e) {
+            let url = 'WorkingDevices/RunDevice'
+            $.get(url).done(function (data) {
+                $('#modal-run-device').modal('show')
+            })
+        });
+
+        $('#addOrderModel').click(function (e) {
+            $('#modal-add-order').modal('show')
+        });
+
+    </script>
+}
+
+

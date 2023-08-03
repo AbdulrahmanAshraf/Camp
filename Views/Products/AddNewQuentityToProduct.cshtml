@@ -1,0 +1,122 @@
+﻿@model PlaystationProject.Dtos.Products.AddNewQuentityToProductDto
+
+
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/style-rtl.css">
+
+<div aria-hidden="true" aria-labelledby="modal-add-quantity-label" role="dialog" tabindex="-1" id="modal-add-quantity" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="productNamee" class="section_title custom_title">  </h4>
+                <button type="button" class="close" data-bs-dismiss="modal"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="container" dir="rtl">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-10 m-auto">
+                            <div class="row">
+                                <div class="col-12 mt-5 row" id="div-register">
+                                    <div class="col-12 steps-page-content">
+
+
+
+
+                                        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "addQuantityForm" }))
+                                        {
+                                            @Html.AntiForgeryToken();
+                                            @Html.ValidationSummary(true);
+                                            <!------------------------------------->
+                                            <input type="hidden" id="productId" asp-for="Id" />
+                                            <div id="register-form-wizard">
+
+
+                                                <section data-steps="1">
+                                                    <div class="card-body p-0">
+
+                                                        <div class="form-group mb-2">
+                                                            <label class="form-label">الكمية<span class="text-danger">*</span></label>
+                                                            <input type="number" class="form-control form-control-solid" placeholder="ادخل الكمية" asp-for="Quantity" />
+                                                            @Html.ValidationMessageFor(model => model.Quantity, "", new { @class = "text-danger" })
+
+                                                        </div>
+
+
+                                                        <div class="col-md-12 mx-auto mb-2">
+                                                            <div>
+                                                                <button  id="addnewQuantity" class="btn btn-sm m-0 login-page-form-loginBtn mt-3" type="button">
+
+                                                                    <span> اضافة الكمية</span>
+                                                                    <i class="fas fa-plus mr-3"></i>
+                                                                </button>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </section>
+
+                                            </div>
+                                            <!------------------------------------->
+                                        }
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+          
+                    <script>
+                        $('#addnewQuantity').on("click", function () {
+                            $.ajax({
+                                type: "POST",
+                                url: "/Products/AddNewQuentityToProduct",
+                                data: $('#addQuantityForm').serialize(),
+                                headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+
+                                success: function (res) {
+                                    if (res.success) {
+                                        toastr.success('', res.message, toastr.options = {
+                                            "positionClass": "toast-top-right",
+                                            "fadeIn": 300,
+                                            "fadeOut": 100,
+                                            "timeOut": 3000,
+                                            "extendedTimeOut": 1000
+                                        });
+                                        setTimeout(function () { location.reload(); }, 2000);
+                                    }
+                                    else {
+                                        toastr.error('', res.message, toastr.options = {
+                                            "positionClass": "toast-top-right",
+                                            "fadeIn": 300,
+                                            "fadeOut": 100,
+                                            "timeOut": 3000,
+                                            "extendedTimeOut": 1000
+                                        });
+                                    }
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    if (jqXHR.status == 401) {
+                                        toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                                            "positionClass": "toast-top-right",
+                                            "fadeIn": 300,
+                                            "fadeOut": 100,
+                                            "timeOut": 3000,
+                                            "extendedTimeOut": 1000
+                                        });
+                                        setTimeout(function () { location.reload() }, 2000);
+                                    }
+
+                                }
+                            });
+                            return false;
+                        });
+                    </script>

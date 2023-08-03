@@ -1,0 +1,199 @@
+﻿
+@model List<PlaystationProject.Dtos.History.GetHistoryDto>
+
+
+@{
+    ViewData["Title"] = "السجل";
+}
+
+<section class="cat-area img-bg-bg workshop-section">
+    <div class="container workshop-section-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="overlay-img">
+                    <div class="section-heading text-center">
+                        <img src="../images/vicon.png" alt="icon section" class="custom-image">
+                        <h4 class="section_title custom_title">السجل</h4>
+                    </div>
+                </div>
+                <div class="overlay-img"></div>
+            </div>
+        </div>
+        @using (Html.BeginForm("Index", "History", FormMethod.Get))
+        {
+            <div class="row d-flex justify-content-center workshop-table-container mb-3">
+                <div class="col-md-1">
+                    <span>عرض</span>
+                </div>
+                <div class="col-sm-1">
+                    <span>
+                        <select class="form-select form-select-sm mySelect" aria-label="Default select example" name="pagesize">
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="150">150</option>
+                            <option value="200">200</option>
+                        </select>
+                    </span>
+                </div>
+                <div class="col-sm-1">
+                    <span>عنصر</span>
+                </div>
+
+                <div class="col-sm-4">
+                    <span>بحث:</span>
+                    <input type="text" name="search" value="@ViewBag.search" />
+                </div>
+                @*<div class="col-md-1">
+                    <button id="send-message-btn" class="btn btn-sm m-0 login-page-form-loginBtn" type="submit">بحث</button>
+                </div>*@
+            </div>
+            <div class="row d-flex justify-content-center workshop-table-container mb-3">
+
+
+                <div class="col-sm-2">
+                    <span>من</span>
+                    <input type="date" name="from" value="@ViewBag.from" />
+                </div>
+
+
+                <div class="col-sm-2">
+                    <span>الي</span>
+                    <input type="date" name="to" value="@ViewBag.to" />
+                </div>
+
+
+                <div class="col-md-1">
+                    <button id="send-message-btn" class="btn btn-sm m-0 login-page-form-loginBtn" type="submit">بحث</button>
+                </div>
+                @if (ViewBag.search != null || ViewBag.from != null || ViewBag.to != null)
+                {
+                    <div class="col-md-2">
+                        <button class="btn btn-sm m-0 login-page-form-loginBtn" style="background-color:red" type="button"
+                                onclick="location.href='@Url.Action("Index", "History")'">
+                            الغاء البحث
+                            <i class="fa fa-times" aria-hidden="true"></i>
+
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+        <div class="row d-flex justify-content-center  workshop-table-container mb-3">
+            <div class="col-md-9">
+                @if (Model.Count > 0)
+                {
+                    <table class="responsive-table">
+                        <tr class="text-center">
+                            <th>اسم المستخدم</th>
+                            <th>الوصف</th>
+                            <th>تاريخ التسجيل</th>
+                            @*<th>التحكم</th>*@
+                        </tr>
+                        @foreach (var h in Model)
+                        {
+                            <tr id="@h.Id">
+                                <td data-th="اسم المستخدم">@h.UserFullName </td>
+                                <td data-th="الوصف"> @h.Description </td>
+
+                                <td data-th="تاريخ التسجيل">@h.Date </td>
+                                @*<td data-th="التحكم">
+                            <button class="btn btn-info text-center detail-ws-btn" type="button" data-toggle="modal" data-target="#exampleModal"
+                                    onclick="location.href='@Url.Action("Edit", "Expenses",new {id=expense.Id.ToString()})'">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="ConfirmDelete('@expense.Id')" class="btn btn-danger text-center detail-ws-btn" type="button" data-toggle="modal" data-target="#exampleModal">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>*@
+                            </tr>
+                        }
+                    </table>
+                    @if (ViewBag.pageCount > 1)
+                    {
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination">
+                                @if (ViewBag.pagenumber > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="/History/Index?page=@(ViewBag.pagenumber - 1) && search=@ViewBag.search && pagesize=@ViewBag.pagesize&&from=@ViewBag.from &&to=@ViewBag.to" aria-label="Previous">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                }
+                                @for (int i = 0; i < ViewBag.pageCount; i++)
+                                {
+                                    if ((i + 1) == ViewBag.pagenumber)
+                                    {
+                                        <li class="page-item">
+                                            <a style="background-color: #1b6ec2;color:white" class="page-link" href="/History/Index?page=@(i + 1) && search=@ViewBag.search && pagesize=@ViewBag.pagesize&&from=@ViewBag.from &&to=@ViewBag.to">@(i + 1)</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="/History/Index?page=@(i + 1) && search=@ViewBag.search && pagesize=@ViewBag.pagesize&&from=@ViewBag.from &&to=@ViewBag.to">@(i + 1)</a>
+                                        </li>
+                                    }
+                                }
+                                @if (ViewBag.pagenumber < ViewBag.pageCount)
+                                {
+                                    <li>
+                                        <a class="page-link" href="/History/Index?page=@(ViewBag.pagenumber + 1) && search=@ViewBag.search && pagesize=@ViewBag.pagesize&&from=@ViewBag.from &&to=@ViewBag.to" aria-label="Next">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    }
+                }
+                else
+                {
+                    <div class="empty-data-block mt-5">
+                        <div>
+                            <img src="./images/noData.svg" alt="No Data Image" />
+                            <p>لا يوجد بيانات</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            type: "Get",
+            url: "/CheckAuthorization/GetCanViewLinks",
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+            success: function (res) {
+                if (res.showDevices == false) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+                else   $(".mySelect").val(@ViewBag.pagesize).attr('selected', 'selected');
+
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+            }
+        });
+    });
+</script>
+

@@ -1,0 +1,234 @@
+﻿@using Microsoft.AspNetCore.Identity
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="author" content="TechyDevs">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>Camp Club</title>
+
+    <!-- Google fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Favicon -->
+    <link rel="icon" sizes="16x16" href="images/vicon.png">
+
+    <!-- inject:css -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/bootstrap-rtl.min.css">
+    <link rel="stylesheet" href="/css/line-awesome.css">
+    <link rel="stylesheet" href="/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="/css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="/css/fancybox.css">
+    <link rel="stylesheet" href="/css/magnific-popup.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style-rtl.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+    <link href="~/css/Pagination.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/NoData.css" rel="stylesheet" type="text/css" />
+    @*<link rel="stylesheet" href="/css/toastr.css">*@
+    <!-- end inject -->
+    @* for highlight map image *@
+    <script src="~/mapper/cvi_tip_lib.js"></script>
+    <script src="~/mapper/maputil.js"></script>
+    <script src="~/mapper/mapper.js"></script>
+    <link href="~/mapper/tooltip.css" rel="stylesheet" />
+
+    @RenderSection("header", required: false)
+</head>
+<body>
+
+    <!-- start cssload-loader -->
+    <div class="preloader">
+        <div class="loader">
+            <svg class="spinner" viewBox="0 0 50 50">
+                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+            </svg>
+        </div>
+    </div>
+    <!-- end cssload-loader -->
+    <!-- START HEADER AREA -->
+    <header class="header-menu-area bg-white">
+        <div class="header-menu-content pr-150px pl-150px bg-white">
+            <div class="container-fluid">
+                <div class="main-menu-content">
+
+                    <div class="row align-items-center">
+                        <div class="col-lg-2">
+                            <div class="logo-box">
+                                <img src="../images/vicon.png" alt="icon section" class="custom-image">
+                                <h4 class="section_title custom_title">Camp Club</h4>
+                                <div class="user-btn-action d-flex">
+                                    <div class="off-canvas-menu-toggle main-menu-toggle icon-element icon-element-sm shadow-sm" data-toggle="tooltip" data-placement="top" title="القائمة الرئيسية">
+                                        <i class="la la-bars"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-10">
+                            <div class="menu-wrapper">
+                                <nav class="main-menu align-items-center">
+                                    <ul>
+                                        <li>
+                                            <a href="@Url.ActionLink("Index","WorkingDevices")">الرئيسية</a>
+                                        </li>
+                                        <li class="orders">
+                                            <a href="@Url.ActionLink("Index","Order")">الطلبات</a>
+                                        </li>
+                                        <li class="devices">
+                                            <a href="@Url.ActionLink("Index", "Devices")">ادارة الأجهزة</a>
+                                        </li>
+                                        <li class="products">
+                                            <a href="@Url.ActionLink("Index", "Products")">ادارة المنتجات</a>
+                                        </li>
+                                        <li class="expenses">
+                                            <a href="@Url.ActionLink("Index", "Expenses")">المصروفات</a>
+                                        </li>
+                                        <li class="incomes">
+                                            <a href="@Url.ActionLink("Index", "Incomes")">الايرادات</a>
+                                        </li>
+                                        <li>
+                                            <a id="todayIncomes" href="#">الايراد اليومي</a>
+                                        </li>
+                                        <li class="history">
+                                            <a href="@Url.ActionLink("Index", "History")">السجل</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                                <div class="nav-right-button">
+                                    <div class="d-none d-lg-inline-block mx-2">
+                                        <a class="btn login-btn" onclick="logout()"><i class="fas fa-sign-out-alt fa-rotate-180"></i></a>
+                                    </div>
+
+                                </div><!-- end nav-right-button -->
+                            </div><!-- end menu-wrapper -->
+                        </div><!-- end col-lg-10 -->
+
+                        <div class="col-lg-1"></div>
+                    </div><!-- end row -->
+                </div>
+            </div><!-- end container-fluid -->
+        </div><!-- end header-menu-content -->
+        <div class="off-canvas-menu custom-scrollbar-styled main-off-canvas-menu">
+            <div class="off-canvas-menu-close main-menu-close icon-element icon-element-sm shadow-sm" data-toggle="tooltip" data-placement="left" title="Close menu">
+                <i class="la la-times"></i>
+            </div><!-- end off-canvas-menu-close -->
+            <ul class="generic-list-item off-canvas-menu-list pt-90px">
+                <li>
+                    <a href="@Url.ActionLink("Index","Home")">الرئيسية</a>
+                </li>
+                <li class="products">
+                    <a href="@Url.ActionLink("Index","Products")">ادارة المنتجات</a>
+                </li>
+                <li class="devices">
+                    <a href="@Url.ActionLink("Index","Devices")">ادارة الأجهزة</a>
+                </li>
+                <li class="orders">
+                    <a href="@Url.ActionLink("Index","Order")">الطلبات</a>
+                </li>
+                <li class="expenses">
+                    <a href="@Url.ActionLink("Index", "Expenses")">المصروفات</a>
+                </li>
+                <li class="history">
+                    <a href="@Url.ActionLink("Index", "History")">السجل</a>
+                </li>
+                <li class="incomes">
+                    <a href="@Url.ActionLink("Index", "Incomes")">الايرادات</a>
+                </li>
+            </ul>
+
+            <div class="login-btn-sm-container">
+                <a class="btn login-btn-sm p-1" onclick="logout()">خروج</a>
+            </div>
+        </div><!-- end off-canvas-menu -->
+        <div class="body-overlay"></div>
+    </header><!-- end header-menu-area -->
+    <!-- END HEADER AREA -->
+    @await Html.PartialAsync("_TodayIncomes")
+
+    @RenderBody()
+
+    <!-- template js files -->
+    <script src="~/js/jquery-3.6.0.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/fancybox.js"></script>
+    <script src="/js/jquery.lazy.min.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
+    <script src="/js/jquery.counterup.min.js"></script>
+    <script src="/js/main-rtl.js"></script>
+    <script type="text/javascript" charset="utf8" src="https:////cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="@Url.Content("~/js/jquery.validate.min.js")"></script>
+    <script src="@Url.Content("~/js/jquery.validate.unobtrusive.min.js")"></script>
+    @*<script src="~/js/toastr.js"></script>*@
+    <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                type: "Get",
+                url: "/CheckAuthorization/GetCanViewLinks",
+                headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+                success: function (res) {
+                    if (res.showProducts == false) {
+                        $(".products").hide();
+                    }
+                    if (res.showDevices == false) {
+                        $(".devices").hide();
+                    }
+                    if (res.showOrders == false) {
+                        $(".orders").hide();
+                    }
+                    if (res.showExpenses == false) {
+                        $(".expenses").hide();
+                    }
+                    if (res.showHistory == false) {
+                        $(".history").hide();
+                    }
+                    if (res.showIncomes == false) {
+                        $(".incomes").hide();
+                    }
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status == 401) {
+                        toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                            "positionClass": "toast-top-right",
+                            "fadeIn": 300,
+                            "fadeOut": 100,
+                            "timeOut": 3000,
+                            "extendedTimeOut": 1000
+                        });
+                        window.location.href = '/auth';
+                    }
+                }
+            });
+        });
+    </script>
+
+    <script>
+
+        $('#todayIncomes').click(function (e) {
+            let url = 'Incomes/GetTodayIncomes'
+            $.get(url).done(function (data) {
+                $('#incomesId').html(data.data.incomes)
+                $('#expensesId').html(data.data.expenses)
+                $('#today-incomes-modal').modal('show')
+            })
+        });
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/auth';
+        };
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+
+

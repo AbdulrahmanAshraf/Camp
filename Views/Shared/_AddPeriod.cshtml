@@ -1,0 +1,116 @@
+﻿@model PlaystationProject.Dtos.Devices.AddPeriodDto
+
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/style-rtl.css">
+
+<div aria-hidden="true" aria-labelledby="modal-add-period-label" role="dialog" tabindex="-1" id="modal-add-period" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="section_title custom_title">اضافة فترة</h4>
+                <button type="button" class="close" data-bs-dismiss="modal"><span aria-hidden="true">×</span></button>
+            </div>
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "addPeriodForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <input id="workingdeviceIdInput" type="hidden" asp-for="WorkingDeviceId" />
+                <div class="modal-body form-horizontal">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group text-right">
+                                <input type="radio" class="form-control-solid" value="SINGL" id="Single" name="PeriodType" />  فردي
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group text-right">
+                                <input type="radio" value="MULTI" id="Multi" name="PeriodType" />  زوجي
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(model => model.PeriodType, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm m-0 login-page-form-loginBtn mt-3 relative" id="addPeriodBtnSubmit">
+                        <i class="fa fa-plus"></i> اضافة
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script src="~/js/jquery-3.6.0.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="@Url.Content("~/js/jquery.validate.min.js")"></script>
+<script src="@Url.Content("~/js/jquery.validate.unobtrusive.min.js")"></script>
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            type: "Get",
+            url: "/CheckAuthorization/GetCanViewLinks",
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+            success: function (res) {
+                if (res.workingDevices == false) {
+                    $(".workingDevices").hide();
+                }
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+            }
+        });
+    });
+</script>
+<script>
+    $('#addPeriodBtnSubmit').on("click", function () {
+        $.ajax({
+            type: "POST",
+            url: "/WorkingDevices/AddPeriod",
+            data: $('#addPeriodForm').serialize(),
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+            success: function (res) {
+                if (res.success) {
+                    toastr.success('', res.message, toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    setTimeout(function () { location.replace('/'); }, 1000);
+                }
+                else {
+                    toastr.error('', res.message, toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    setTimeout(function () { location.replace('/'); }, 1000);
+                }
+
+            }
+        });
+        return false;
+    });
+</script>
+

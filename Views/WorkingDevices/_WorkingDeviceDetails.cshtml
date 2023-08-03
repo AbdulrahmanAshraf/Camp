@@ -1,0 +1,81 @@
+﻿@model PlaystationProject.Dtos.WorkingDevices.GetWorkingDeviceDetailsDto
+
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/style-rtl.css">
+
+<div aria-hidden="true" aria-labelledby="modal-device-details-label" role="dialog" tabindex="-1" id="modal-device-details" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-right">تفاصيل جهاز</h4>
+                <button type="button" class="close" data-bs-dismiss="modal"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body form-horizontal justify-content-center">
+                <div class="row">
+                    <div class="col-6">
+                        <label class="form-label form-label"> اسم الجهاز</label><br />
+                        <label class="form-label form-label">وقت البداية </label><br />
+                        <label class="form-label form-label">وقت النهاية </label><br />
+                    </div>
+                    <div class="col-6">
+                        <span id="DeviceName"> </span><br />
+                        <span id="DeviceStartDate"> </span><br />
+                        <span id="DeviceEndDate"> </span><br />
+                    </div>
+                </div>
+                <div class="row d-flex justify-content-center  workshop-table-container">
+                    <div class="col-md-6">
+                        <table id="DevicePeriods" class="responsive-table"></table>
+                    </div>
+                    <div class="col-md-6">
+                        <table id="DeviceOrder" class="responsive-table"></table>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-6">
+                        <span>حساب الجهاز:</span>
+                        <span id="DevicePlayStationTotalCost"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <span>حساب الطلب:</span>
+                        <span id="DeviceOrderTotalCost"></span>
+                    </div>
+                </div>
+                @*<div class="col-md-6">
+                    <span> الخصم:</span>
+                    <span id="Discount"> </span>
+                </div>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/jquery-3.6.0.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="@Url.Content("~/js/jquery.validate.min.js")"></script>
+<script src="@Url.Content("~/js/jquery.validate.unobtrusive.min.js")"></script>
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            type: "Get",
+            url: "/CheckAuthorization/GetCanViewLinks",
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+            success: function (res) {
+                if (res.workingDevices == false) {
+                    $(".workingDevices").hide();
+                }
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+            }
+        });
+    });
+</script>

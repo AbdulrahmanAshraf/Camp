@@ -1,0 +1,153 @@
+﻿@model PlaystationProject.Dtos.Expenses.AddExpenseDto
+
+<section class="cat-area img-bg-bg workshop-section">
+    <div class="container workshop-section-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="overlay-img">
+                    <div class="section-heading text-center">
+                        <img src="../images/vicon.png" alt="icon section" class="custom-image">
+                        <h4 class="section_title custom_title">اضافة مصروف</h4>
+                    </div>
+                </div>
+                <div class="overlay-img"></div>
+            </div>
+        </div>
+
+        <div class="container" dir="rtl">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-10 m-auto">
+                        <div class="row">
+                            <div class="col-12 mt-5 row" id="div-register">
+                                <div class="col-12 steps-page-content">
+                                    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "addForm" }))
+                                    {
+                                        @Html.AntiForgeryToken();
+                                        <input type="hidden" name="grtoken" id="hdnGrToken" />
+                                        <div id="register-form-wizard">
+                                            <section data-steps="1">
+                                                <div class="card-body p-0">
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label">نوع المصروف<span class="text-danger">*</span></label>
+                                                        <select class="form-select form-select-sm form-control-solid" aria-label="Default select example" asp-for="Type">
+                                                            <option value="" selected>ادخل نوع المصروف</option>
+                                                            @foreach (var type in ViewBag.types)
+                                                            {
+                                                                <option value="@type.Code">@type.Name</option>
+                                                            }
+                                                        </select>
+                                                        @Html.ValidationMessageFor(model => model.Type, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label form-label">وصف المصروف<span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control form-control-solid" placeholder="ادخل وصف المصروف" asp-for="Description" />
+                                                        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label">التكلفة<span class="text-danger">*</span></label>
+                                                        <input min="0" type="number" class="form-control form-control-solid" placeholder="ادخل التكلفة" asp-for="Cost" />
+                                                        @Html.ValidationMessageFor(model => model.Cost, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    <div class="col-md-12 mx-auto mb-2">
+                                                        <div>
+                                                            <button id="send-message-btn" class="btn btn-sm m-0 login-page-form-loginBtn mt-3" type="submit">
+                                                                <span>اضافة</span>
+                                                                <i class="fa fa-plus mr-3"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            type: "Get",
+            url: "/CheckAuthorization/GetCanViewLinks",
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+            success: function (res) {
+                if (res.showDevices == false) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+            }
+        });
+    });
+</script>
+@section Scripts {
+    <script>
+        $('#addForm').on("submit", function () {
+            $.ajax({
+                type: "POST",
+                url: "/Expenses/Add",
+                data: $('#addForm').serialize(),
+                 headers: {"Authorization": 'Bearer '+localStorage.getItem('token')},
+                success: function (res) {
+                    if (res.success) {
+                        toastr.success('', res.message, toastr.options = {
+                            "positionClass": "toast-top-right",
+                            "fadeIn": 300,
+                            "fadeOut": 100,
+                            "timeOut": 3000,
+                            "extendedTimeOut": 1000
+                        });
+                        setTimeout(function () { location.replace('/Expenses'); }, 1000);
+                    }
+                    else {
+                        toastr.error('', res.message, toastr.options = {
+                            "positionClass": "toast-top-right",
+                            "fadeIn": 300,
+                            "fadeOut": 100,
+                            "timeOut": 3000,
+                            "extendedTimeOut": 1000
+                        });
+                    }
+                },  error: function(jqXHR, textStatus, errorThrown){
+        if(jqXHR.status==401){
+         toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                            "positionClass": "toast-top-right",
+                            "fadeIn": 300,
+                            "fadeOut": 100,
+                            "timeOut": 3000,
+                            "extendedTimeOut": 1000
+                        });
+            setTimeout(function () { location.replace('/Expenses'); }, 1000);
+        }
+
+  }
+            });
+            return false;
+        });
+    </script>
+
+}

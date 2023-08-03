@@ -1,0 +1,140 @@
+﻿@model PlaystationProject.Dtos.WorkingDevices.GetWorkingDeviceDetailsDto
+@{
+  Layout=null;
+}
+
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/style-rtl.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
+
+
+<div aria-hidden="true" aria-labelledby="modal-close-device-label" role="dialog" tabindex="-1" id="modal-close-device" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="section_title custom_title">اغلاق جهاز</h4>
+                <button type="button" class="close" data-bs-dismiss="modal"><span aria-hidden="true">×</span></button>
+            </div>
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "closeDeviceForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="deviceId" asp-for="Id" />
+                <div class="modal-body form-horizontal">
+                    <div class="row justify-content-center">
+                        <div class="col-6">
+                            <label class="form-label">اسم الجهاز</label><br />
+                            <label class="form-label">وقت البداية</label><br />
+                            <label class="form-label">وقت النهاية</label><br />
+                            <label class="form-label">حساب الجهاز</label><br />
+                            <label class="form-label">حساب الطلب</label><br />
+                            <label class="form-label">الاجمالي</label><br />
+                        </div>
+                        <div class="col-6">
+                            <span id="Name"></span><br />
+                            <span id="StartDate"></span><br />
+                            <span id="EndDate"></span><br />
+                            <span id="PlayStationTotalCost"></span><br />
+                            <span id="OrderTotalCost"></span><br />
+                            <span id="TotalCost"></span><br />
+                        </div>
+                    </div>
+                    @*<div class="row d-flex justify-content-center  workshop-table-container">
+                            <div class="col-md">
+                                <table id="Periods" class="responsive-table">
+                                </table>
+                            </div>
+                        </div>*@
+                    <div class="row justify-content-center">
+                        <div class="col-6">
+                            <span>الخصم</span>
+                        </div>
+                        <div class="col-6">
+                            <input type="number" min="0" asp-for="Discount" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm m-0 login-page-form-loginBtn mt-3 relative" id="closeDeviceBtnSubmit">
+                        <i class="fa fa-power-off"></i>  اغلاق
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script src="~/js/jquery-3.6.0.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="@Url.Content("~/js/jquery.validate.min.js")"></script>
+<script src="@Url.Content("~/js/jquery.validate.unobtrusive.min.js")"></script>
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            type: "Get",
+            url: "/CheckAuthorization/GetCanViewLinks",
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+            success: function (res) {
+                if (res.workingDevices == false) {
+                    $(".workingDevices").hide();
+                }
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+            }
+        });
+    });
+</script>
+<script>
+    $('#closeDeviceBtnSubmit').on("click", function () {
+        $.ajax({
+            type: "POST",
+            url: "/WorkingDevices/CloseDeviceWorking",
+            data: $('#closeDeviceForm').serialize(),
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+
+            success: function (res) {
+                if (res.success) {
+                    toastr.success('', res.message, toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    setTimeout(function () { location.replace('/'); }, 1000);
+                }
+                else {
+                    toastr.error('', res.message, toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    setTimeout(function () { location.replace('/'); }, 1000);
+                }
+
+            }
+        });
+        return false;
+    });
+</script>

@@ -1,0 +1,121 @@
+﻿@model PlaystationProject.Dtos.Account.LoginDto
+
+@{
+    Layout = "~/Views/Shared/LoginLayout.cshtml";
+}
+
+<section class="cat-area img-bg-bg workshop-section">
+    <div class="container workshop-section-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="overlay-img">
+                    <div class="section-heading text-center">
+                        <img src="../images/vicon.png" alt="icon section" class="custom-image">
+                        <h4 class="section_title custom_title">تسجيل الدخول</h4>
+                    </div>
+                </div>
+                <div class="overlay-img"></div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row mt-5">
+                <div class="col-md-6 mx-auto">
+                    <div class="login-page-container card border-0 mx-auto">
+                        <div class="login-page-header mt-3 text-center">
+                            <h5>تسجيل الدخول  </h5>
+                        </div>
+                        <div class="login-page-form mt-2">
+                            <div class="row">
+                                <div class="input-box col-md-9 mx-auto">
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "loginform" }))
+                                            {
+                                                @Html.AntiForgeryToken();
+                                                <input type="hidden" name="grtoken" id="hdnGrToken" />
+                                                <div class="row">
+
+                                                    <div class="col-md-12">
+                                                        <label class="form-label">اسم المستخدم</label>
+                                                        <div class="form-group form-group-sm">
+                                                            <input class="form-control login-page-form-input" type="text" name="username" id="txtUsername" asp-for="UserName">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <label class="form-label">كلمة المرور</label>
+                                                        <div class="form-group form-group-sm">
+                                                            <input class="form-control login-page-form-input" type="password" name="password" id="txtpassword" asp-for="Password">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12 mx-auto mb-2">
+                                                        <div>
+                                                            <button id="send-message-btn" class="btn btn-sm m-0 login-page-form-loginBtn" type="submit">دخول</button>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+@*<script type="text/javascript">
+    $(function () {
+        var token = localStorage.getItem('token')
+        if (token)
+            window.location.href = '/home';
+
+    });
+</script>*@
+
+
+@section Scripts {
+    <script>
+        $('#loginform').on("submit", function () {
+            $.ajax({
+                type: "POST",
+                url: "/Auth/Login",
+                data: $('#loginform').serialize(),
+                success: function (res) {
+                    if (res.success) {
+                        localStorage.setItem('token', res.data.token)
+                        toastr.success('', res.message, toastr.options = {
+                            "positionClass": "toast-top-right",
+                            "fadeIn": 300,
+                            "fadeOut": 100,
+                            "timeOut": 3000,
+                            "extendedTimeOut": 1000
+                        });
+
+                        setTimeout(function () { location.replace('/WorkingDevices'); }, 2000);
+                    }
+                    else {
+                        toastr.error('', res.message, toastr.options = {
+                            "positionClass": "toast-top-right",
+                            "fadeIn": 300,
+                            "fadeOut": 100,
+                            "timeOut": 3000,
+                            "extendedTimeOut": 1000
+                        });
+                    }
+                },
+            });
+            return false;
+        });
+    </script>
+
+}

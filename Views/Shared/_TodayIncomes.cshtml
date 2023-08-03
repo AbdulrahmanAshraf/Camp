@@ -1,0 +1,63 @@
+﻿@*@model PlaystationProject.Dtos.Incomes.TodayIncomesDto*@
+
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/style-rtl.css">
+<style>
+    .card {
+        text-align:center;
+        padding:10px;
+        border-radius: 1rem;
+        border: none;
+        -webkit-box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+        position: relative;
+        -webkit-transition: -webkit-transform 0.3s ease;
+        transition: -webkit-transform 0.3s ease;
+        transition: transform 0.3s ease;
+        transition: transform 0.3s ease, -webkit-transform 0.3s ease;
+    }
+
+        .card .card-body {
+            height: 5rem;
+            overflow-y: auto;
+        }
+
+            .card .card-body span {
+                display: -webkit-box;
+                display: -ms-flexbox;
+                display: flex;
+                -webkit-box-pack: center;
+                -ms-flex-pack: center;
+                justify-content: center;
+            }
+</style>
+
+<div aria-hidden="true" aria-labelledby="today-incomes-label" role="dialog" tabindex="-1" id="today-incomes-modal" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title text-right">الايراد اليومي </h2>
+                <button type="button" class="close" data-bs-dismiss="modal"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-5 card">
+                        <span>
+                            الايرادات
+                        </span>
+                        <span id="incomesId"></span>
+                    </div>
+                    <div class="col-md-2">
+                        
+                    </div>
+                    <div class="col-md-5 card">
+                        <span>
+                            المصروفات
+                        </span>
+                        <span id="expensesId"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

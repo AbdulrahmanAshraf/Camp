@@ -1,0 +1,306 @@
+﻿@model List<PlaystationProject.Dtos.Orders.GetOrderDto>
+
+<style>
+    .card {
+        border-radius: 1rem;
+        border: none;
+        -webkit-box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+        position: relative;
+        -webkit-transition: -webkit-transform 0.3s ease;
+        transition: -webkit-transform 0.3s ease;
+        transition: transform 0.3s ease;
+        transition: transform 0.3s ease, -webkit-transform 0.3s ease;
+    }
+
+        .card:hover {
+            -webkit-transform: scale(1.05);
+            transform: scale(1.05);
+        }
+
+        .card .card-body {
+            height: 20rem;
+            overflow-y: auto;
+        }
+
+            .card .card-body span {
+                display: -webkit-box;
+                display: -ms-flexbox;
+                display: flex;
+                -webkit-box-pack: center;
+                -ms-flex-pack: center;
+                justify-content: center;
+            }
+
+                .card .card-body span.friend-name {
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
+                    -webkit-box-pack: center;
+                    -ms-flex-pack: center;
+                    justify-content: center;
+                    margin-top: 0.5rem;
+                    margin-bottom: 0.5rem;
+                    color: #2bb574;
+                    font-weight: bold;
+                    list-style: none;
+                    padding-left: 0;
+                    overflow-y: auto;
+                    height: 4rem;
+                }
+</style>
+
+
+<section class="cat-area img-bg-bg workshop-section">
+    <div class="container workshop-section-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="overlay-img">
+                    <div class="section-heading text-center">
+                        <img src="../images/vicon.png" alt="icon section" class="custom-image">
+                        <h4 class="section_title custom_title">الطلبات </h4>
+                    </div>
+                </div>
+                <div class="overlay-img"></div>
+            </div>
+        </div>
+        @*<button id="send-message-btn" class="btn btn-sm m-0 login-page-form-loginBtn mb-4" onclick="location.href='@Url.Action("CreateOrder", "Order")'">
+                <span> اضافة طلب</span>
+                <i class="fa fa-plus mr-3"></i>
+
+            </button>*@
+
+        <button id="addOrderModel" class="btn btn-sm m-0 login-page-form-loginBtn mb-4" data-bs-toggle="modal" data-bs-target="#modal-add-order">
+            <span> اضافة طلب</span>
+            <i class="fa fa-plus mr-3"></i>
+        </button>
+        @using (Html.BeginForm("Index", "Order", FormMethod.Get))
+        {
+    <div class="row d-flex justify-content-center  workshop-table-container">
+        <div class="col-md-2">
+            <span>نوع الطلب</span>
+        </div>
+        <div class="col-md-2">
+
+            <select class="form-select form-select-sm mySelect" aria-label="Default select example" name="PaidOrNot">
+                <option value="@null">الكل</option>
+                <option value="paid">مدفوع</option>
+                <option value="unpaid">غير مدفوع</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <span>بحث :</span>
+            <input type="text" name="search" value="@ViewBag.search" />
+            <input type="text" hidden id="paidOrNot" value="@ViewBag.PaidOrNot" />
+
+        </div>
+        <div class="col-md-1">
+            <button id="send-message-btn" class="btn btn-sm m-0 login-page-form-loginBtn" type="submit">بحث</button>
+        </div>
+
+        @if (ViewBag.search != null )
+        {
+            <div class="col-md-2">
+                <button class="btn btn-sm m-0 login-page-form-loginBtn" style="background-color:red" type="button"
+                        onclick="location.href='@Url.Action("Index", "Order")'">
+                    الغاء البحث
+                    <i class="fa fa-times" aria-hidden="true"></i>
+
+                </button>
+            </div>
+        }
+    </div>
+        }
+        @if (Model.Count > 0)
+        {
+
+            <div class="row mt-4">
+                @foreach (var order in Model)
+                {
+                    <div class="col-lg-4 col-md-3 mb-3">
+                        <div class="card">
+                            @if (order.IsPaid)
+                            {
+                                <span class="badge badge-success rounded p-1 px-2">  مدفوع</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger rounded p-1 px-2">  غير مدفوع </span>
+
+                            }
+                            <div class="card-body">
+                                <span class="friend-name">طلب رقم @order.OrderId</span>
+                                <h6> تاريخ الطلب :@order.Date</h6>
+                                <h6>التكلفة الاجمالية :@order.TotalCost جنيه </h6>
+                                <table class="responsive-table">
+                                    <tr>
+                                        <th>اسم المنتج</th>
+                                        <th>الكمية</th>
+                                    </tr>
+                                    @foreach (var p in order.Products)
+                                    {
+                                        <tr>
+                                            <td data-th="اسم المنتج">@p.ProductName</td>
+                                            <td data-th="الكمية"> @p.Quantity</td>
+                                        </tr>
+                                    }
+                                </table>
+                                @*@if (order.DeviceName != null)
+                                {
+                                    <span>اسم الجهاز :@order.DeviceName</span> <br />
+                                }*@
+                                @*<span style="color: #2bb574">تفاصيل الطلب</span><br />*@
+                            </div>
+
+                            @if (!order.IsPaid)
+                            {
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-12">
+                                        <button class="btn btn-sm m-0 mb-2 login-page-form-loginBtn" style=" background-color: #dc3545;" type="button"
+                                                onclick="location.href='@Url.Action("EditOrder", "Order",new { id = order.Id.ToString() })'">
+                                            تعديل الطلب<i class="fas fa-edit"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12">
+                                        <button class="btn btn-sm m-0 mb-2 login-page-form-loginBtn" style=" background-color: #dc3545;" type="button"
+                                                onclick="PayOrder('@order.Id.ToString()')">
+                                            دفع الطلب<i class="fa-solid fa-cash-register"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                }
+            </div>
+            @if (ViewBag.length > ViewBag.pagesize)
+            {
+                <button id="send-message-btn" class="btn btn-sm m-0 login-page-form-loginBtn mb-4" onclick="location.href = '?pagesize=@(ViewBag.pagesize+3)'">
+                    <span> عرض المزيد</span>
+                    <i class="fa fa-eye"></i>
+                </button>
+            }
+
+        }
+        else
+        {
+            <div class="row d-flex justify-content-center  workshop-table-container">
+                <div class="col-md-9">
+                    <div class="empty-data-block mt-5">
+                        <div>
+                            <img src="./images/noData.svg" alt="No Data Image" />
+                            <p>لا يوجد بيانات</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+
+
+    </div>
+    @await Html.PartialAsync("~/Views/Order/CreateOrder.cshtml", new PlaystationProject.Dtos.Orders.AddEditOrderDto() { Products = new List<PlaystationProject.Dtos.Orders.AddProductToOrderDto>() })
+
+</section>
+
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            type: "Get",
+            url: "/CheckAuthorization/GetCanViewLinks",
+            headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+            success: function (res) {
+                if (res.showOrders == false) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+                else $(".mySelect").val(document.getElementById('paidOrNot').value).attr('selected', 'selected');
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 401) {
+                    toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                        "positionClass": "toast-top-right",
+                        "fadeIn": 300,
+                        "fadeOut": 100,
+                        "timeOut": 3000,
+                        "extendedTimeOut": 1000
+                    });
+                    window.location.href = '/auth';
+                }
+            }
+        });
+    });
+</script>
+
+@section scripts{
+    <script>
+        function PayOrder(id) {
+            swal({
+                title: "هل انت متأكد من الدفع؟",
+                text: "",
+                icon: "warning",
+                buttons: ["الغاء", "تأكيد"],
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: `/Order/PayOrder/${id}`,
+                        type: "Get",
+                        headers: { "Authorization": 'Bearer ' + localStorage.getItem('token') },
+                        success: function (res) {
+                            if (res.success) {
+
+                                toastr.success('', res.message, toastr.options = {
+                                    "positionClass": "toast-top-right",
+                                    "fadeIn": 300,
+                                    "fadeOut": 100,
+                                    "timeOut": 3000,
+                                    "extendedTimeOut": 1000
+                                });
+                                setTimeout(function () { location.replace('/Order'); }, 500);
+                            }
+                            else {
+                                toastr.error('', res.message, toastr.options = {
+                                    "positionClass": "toast-top-right",
+                                    "fadeIn": 300,
+                                    "fadeOut": 100,
+                                    "timeOut": 3000,
+                                    "extendedTimeOut": 1000
+                                });
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            if (jqXHR.status == 401) {
+                                toastr.error('', 'انت لا تملك الصلاحية', toastr.options = {
+                                    "positionClass": "toast-top-right",
+                                    "fadeIn": 300,
+                                    "fadeOut": 100,
+                                    "timeOut": 3000,
+                                    "extendedTimeOut": 1000
+                                });
+
+                            }
+
+                        }
+                    })
+                }
+                else {
+                    $('#orderCheckBox').prop('checked', false);
+                }
+            });
+        }
+
+        $('#addOrderModel').click(function (e) {
+            $('#modal-add-order').modal('show')
+        });
+
+
+
+    </script>
+}
